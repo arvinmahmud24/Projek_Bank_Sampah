@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Lapisan 1: Lingkaran Latar Belakang Gelap -->
+    <item>            <shape android:shape="oval">
+        <!-- Anda bisa ganti warnanya.
+             #000000 adalah hitam,
+             #2E7D32 adalah hijau tua yang cocok dengan header -->
+        <solid android:color="#2E7D32" />
+        <size
+            android:width="40dp"
+            android:height="40dp" />
+    </shape>
+    </item>
+
+    <!-- Lapisan 2: Ikon Daun (ico_eco) di Atasnya -->
+    <item
+        android:drawable="@drawable/ico_eco"
+        android:gravity="center"
+        android:width="24dp"
+        android:height="24dp">
+        <!-- Atribut width dan height di sini mengatur ukuran ikon di dalam lingkaran.
+             Atribut gravity="center" memastikan ikon berada di tengah. -->
+    </item>
+
+</layer-list>
+    

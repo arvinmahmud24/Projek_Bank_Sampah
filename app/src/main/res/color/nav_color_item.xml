@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Warna saat item navigasi aktif (state_checked="true") -->
+    <item android:state_checked="true" android:color="#2ECC71" />
+
+    <!-- Warna default saat item tidak aktif -->
+    <item android:color="#757575" />
+
+</selector>

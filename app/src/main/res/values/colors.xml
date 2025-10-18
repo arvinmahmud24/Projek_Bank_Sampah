@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <resources>
+        <!-- Warna default, biarkan saja -->
+        <color name="purple_200">#FFBB86FC</color>
+        <color name="purple_500">#FF6200EE</color>
+        <color name="purple_700">#FF3700B3</color>
+        <color name="teal_200">#FF03DAC5</color>
+        <color name="teal_700">#FF018786</color>
+        <color name="black">#FF000000</color>
+        <color name="white">#FFFFFFFF</color>
+
+        <!-- Warna Hijau untuk Header Utama -->
+        <color name="green">#4CAF50</color>
+
+        <!-- Warna Hijau Gelap untuk Kartu Poin -->
+        <color name="green_dark">#388E3C</color>
+
+        <!-- Warna Hijau modern untuk Kartu Poin -->
+        <color name="greenOld">#2ECC71</color>
+
+        <!-- Warna lain untuk menu, tips, dll. (bisa disesuaikan lagi) -->
+        <color name="tips_card_background">#2ECC71</color>
+        <color name="menu_icon_background">#E8F5E9</color>
+        <color name="menu_icon_tint">#4CAF50</color>
+        <color name="menu_text_color">#4B5563</color>
+    </resources>
