@@ -1,36 +1,94 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import com.example.myapplication.ui.home.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {@Override
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main); // hubungkan ke layout XML kamu
+public class MainActivity extends AppCompatActivity {
 
-    // Ambil referensi dari XML
-    BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+    private static final String TAG = "MainActivity";
 
-    // Listener untuk navigasi bawah
-    bottomNavigationView.setOnItemSelectedListener(item -> {
-        int itemId = item.getItemId(); // Ambil ID item
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
+        setContentView(R.layout.activity_main);
 
-        if (itemId == R.id.nav_home) {
-            Toast.makeText(this, "Home dipilih", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (itemId == R.id.nav_map) {
-            Toast.makeText(this, "Peta dipilih", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (itemId == R.id.nav_transaction) {
-            Toast.makeText(this, "Transaksi dipilih", Toast.LENGTH_SHORT).show();
-            return true;
-        } else if (itemId == R.id.nav_profile) {
-            Toast.makeText(this, "Profil dipilih", Toast.LENGTH_SHORT).show();
+        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
+        bottomNav.setOnItemSelectedListener(navListener);
+
+        // Tampilkan HomeFragment sebagai halaman default
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+        }
+    }
+
+    private final BottomNavigationView.OnItemSelectedListener navListener = new BottomNavigationView.OnItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home) {
+                selectedFragment = new HomeFragment();
+            } else if (itemId == R.id.nav_map) {
+                selectedFragment = new PetaFragment();
+            } else if (itemId == R.id.nav_transaction) {
+                selectedFragment = new TransaksiFragment();
+            } else if (itemId == R.id.nav_profile) {
+                selectedFragment = new ProfilFragment();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
+            }
+
             return true;
         }
-        return false;
-    });
-}
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: ");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume: ");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: ");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop: ");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d(TAG, "onRestart: ");
+    }
 }
