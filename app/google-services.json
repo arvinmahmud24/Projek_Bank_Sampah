@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "791333641258",
+    "firebase_url": "https://banksampah-99550-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "banksampah-99550",
+    "storage_bucket": "banksampah-99550.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791333641258:android:0e4625c1c82c867c70b753",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnnQsrL7H4np7-ep2i_yMtkT-BTaOYGr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
