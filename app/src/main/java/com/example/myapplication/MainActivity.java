@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -14,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,12 +23,19 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate: ");
         setContentView(R.layout.activity_main);
 
+        Intent intent = getIntent();
+        username = intent.getStringExtra("USERNAME");
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(navListener);
 
         // Tampilkan HomeFragment sebagai halaman default
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            HomeFragment homeFragment = new HomeFragment();
+            Bundle args = new Bundle();
+            args.putString("USERNAME", username);
+            homeFragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, homeFragment).commit();
         }
     }
 
@@ -37,7 +46,11 @@ public class MainActivity extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_home) {
-                selectedFragment = new HomeFragment();
+                HomeFragment homeFragment = new HomeFragment();
+                Bundle args = new Bundle();
+                args.putString("USERNAME", username);
+                homeFragment.setArguments(args);
+                selectedFragment = homeFragment;
             } else if (itemId == R.id.nav_map) {
                 selectedFragment = new PetaFragment();
             } else if (itemId == R.id.nav_transaction) {

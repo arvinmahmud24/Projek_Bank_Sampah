@@ -27,7 +27,9 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        // Listener untuk Tombol Cari Bank Sampah
+        val username = arguments?.getString("USERNAME")
+        binding.textViewUsername.text = username
+
         binding.buttonCariBankSampah.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, CariBankSampahFragment())
