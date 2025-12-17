@@ -21,6 +21,10 @@
             android:value="AIzaSyCC2mKQuowppJdLTH0FhYOo3uUjDTnF8xY" />
 
         <activity
+            android:name=".KalkulatorHargaActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MyApplication.NoActionBar" />
+        <activity
             android:name=".PetaActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />
