@@ -27,12 +27,13 @@ class MainActivity : AppCompatActivity() {
                     selectedFragment = HomeFragment().apply {
                         arguments = Bundle().apply {
                             putString("USERNAME", username)
+                            putString("EMAIL", email) // Baris ini ditambahkan
                         }
                     }
                 }
-                R.id.nav_map -> {
-                    selectedFragment = PetaFragment()
-                }
+//                R.id.nav_map -> {
+//                    selectedFragment = PetaFragment()
+//                }
                 R.id.nav_transaction -> {
                     selectedFragment = TransaksiFragment()
                 }
