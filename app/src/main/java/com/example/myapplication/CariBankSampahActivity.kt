@@ -5,12 +5,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -26,7 +23,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.CancellationTokenSource
 
-class CariBankSampahFragment : Fragment(), OnMapReadyCallback {
+class CariBankSampahActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
     private lateinit var recyclerView: RecyclerView
@@ -35,20 +32,17 @@ class CariBankSampahFragment : Fragment(), OnMapReadyCallback {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val markerMap = HashMap<String, Marker>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_cari_bank_sampah, container, false)
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_cari_bank_sampah)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
-        recyclerView = view.findViewById(R.id.recyclerViewBankSampah)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView = findViewById(R.id.recyclerViewBankSampah)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         populateBankSampahList()
 
@@ -57,39 +51,41 @@ class CariBankSampahFragment : Fragment(), OnMapReadyCallback {
             markerMap[bankSampah.nama]?.showInfoWindow()
         }
         recyclerView.adapter = adapter
-        
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as? SupportMapFragment
-        mapFragment?.getMapAsync(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        
+        // HILANGKAN TOMBOL UI PETA
+        mMap?.uiSettings?.isZoomControlsEnabled = false
+        mMap?.uiSettings?.isMyLocationButtonEnabled = false
+        mMap?.uiSettings?.isMapToolbarEnabled = false
+
         setupMapListeners()
+        
         checkAndGetLocation()
     }
 
     private fun checkAndGetLocation() {
-        if (context?.let { ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) } != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
             setupMapWithInitialData()
             mMap?.isMyLocationEnabled = true
             hitungJarakAsli()
         }
     }
-
-    private fun setupMapWithInitialData() {
+    
+    private fun setupMapWithInitialData(){
         mMap?.clear()
         markerMap.clear()
         val boundsBuilder = LatLngBounds.Builder()
 
         for (bank in bankSampahList) {
-            val marker = mMap?.addMarker(
-                MarkerOptions()
-                    .position(bank.lokasi)
-                    .title(bank.nama)
-                    .snippet("Klik untuk rute")
-            )
+            val marker = mMap?.addMarker(MarkerOptions()
+                .position(bank.lokasi)
+                .title(bank.nama)
+                .snippet("Klik untuk rute"))
             marker?.tag = bank
             marker?.let { markerMap[bank.nama] = it }
             boundsBuilder.include(bank.lokasi)
@@ -102,7 +98,7 @@ class CariBankSampahFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun hitungJarakAsli() {
-        if (context?.let { ActivityCompat.checkSelfPermission(it, Manifest.permission.ACCESS_FINE_LOCATION) } != PackageManager.PERMISSION_GRANTED) return
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return
 
         val cancellationTokenSource = CancellationTokenSource()
         fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cancellationTokenSource.token)
@@ -110,10 +106,7 @@ class CariBankSampahFragment : Fragment(), OnMapReadyCallback {
                 if (location != null) {
                     bankSampahList.forEach {
                         val results = FloatArray(1)
-                        android.location.Location.distanceBetween(
-                            location.latitude, location.longitude,
-                            it.lokasi.latitude, it.lokasi.longitude, results
-                        )
+                        android.location.Location.distanceBetween(location.latitude, location.longitude, it.lokasi.latitude, it.lokasi.longitude, results)
                         it.jarak = results[0]
                     }
                     bankSampahList.sortBy { it.jarak }
@@ -131,21 +124,20 @@ class CariBankSampahFragment : Fragment(), OnMapReadyCallback {
 
         mMap?.setOnInfoWindowClickListener { marker ->
             val bank = marker.tag as? BankSampah
-            bank?.let {
+            bank?.let { 
                 val gmmIntentUri = Uri.parse("google.navigation:q=${it.lokasi.latitude},${it.lokasi.longitude}")
-                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
-                    setPackage("com.google.android.apps.maps")
-                }
-                if (mapIntent.resolveActivity(requireActivity().packageManager) != null) {
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                if (mapIntent.resolveActivity(packageManager) != null) {
                     startActivity(mapIntent)
                 } else {
-                    Toast.makeText(context, "Google Maps tidak terinstal.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Google Maps tidak terinstal.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
-
-    private fun populateBankSampahList() {
+    
+    private fun populateBankSampahList(){
         bankSampahList.add(BankSampah("Bank Sampah Surolaras", "Jl. Suronatan No.Blok NG-2/51, Ngampilan", LatLng(-7.8005, 110.3610)))
         bankSampahList.add(BankSampah("Bank Sampah Mondoroko RW 7", "Jl. Mondorakan No.27, Kotagede", LatLng(-7.8286, 110.3957)))
         bankSampahList.add(BankSampah("Bank Sampah Suryo Resik", "Mj 2/822, RT.44/RW.13, Suryodiningratan", LatLng(-7.8180, 110.3650)))
@@ -167,9 +159,10 @@ class CariBankSampahFragment : Fragment(), OnMapReadyCallback {
         bankSampahList.add(BankSampah("Bank Sampah Igakanas", "Kabupaten Bantul, DIY", LatLng(-7.8900, 110.3500)))
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // Setelah izin diberikan, jalankan kembali logika lokasi
             checkAndGetLocation()
         }
     }
