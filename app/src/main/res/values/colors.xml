@@ -23,4 +23,7 @@
         <color name="menu_icon_background">#E8F5E9</color>
         <color name="menu_icon_tint">#4CAF50</color>
         <color name="menu_text_color">#4B5563</color>
+
+        <!-- Warna Background untuk Layout -->
+        <color name="app_background">#F8F9FA</color>
     </resources>

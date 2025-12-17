@@ -1,12 +1,14 @@
 package com.example.myapplication.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.example.myapplication.R
 import com.example.myapplication.CariBankSampahFragment
+import com.example.myapplication.KatalogHargaActivity
+import com.example.myapplication.R
 import com.example.myapplication.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -35,7 +37,11 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        // Tambahkan OnClickListener untuk tombol lain di sini jika perlu
+        // Listener untuk Tombol Katalog & Harga
+        binding.buttonKatalogHarga.setOnClickListener {
+            val intent = Intent(activity, KatalogHargaActivity::class.java)
+            startActivity(intent)
+        }
 
         return root
     }
