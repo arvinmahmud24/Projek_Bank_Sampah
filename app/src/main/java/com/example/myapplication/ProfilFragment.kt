@@ -2,32 +2,40 @@ package com.example.myapplication
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import com.example.myapplication.databinding.DialogEditProfilBinding
 import com.example.myapplication.databinding.FragmentProfilBinding
+import com.example.myapplication.ui.LoginActivity
 
 class ProfilFragment : Fragment() {
 
     private var _binding: FragmentProfilBinding? = null
     private val binding get() = _binding!!
+    
+    private var tempImageUri: Uri? = null
+    private var dialogBinding: DialogEditProfilBinding? = null
 
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            val selectedImageUri = result.data?.data
-            if (selectedImageUri != null) {
-                binding.imageFotoProfil.setImageURI(selectedImageUri)
-                Toast.makeText(context, "Foto Profil Diperbarui", Toast.LENGTH_SHORT).show()
+            val selectedUri = result.data?.data
+            if (selectedUri != null) {
+                tempImageUri = selectedUri
+                dialogBinding?.dialogImageFoto?.setImageURI(selectedUri)
+                if (dialogBinding == null) {
+                    binding.imageFotoProfil.setImageURI(selectedUri)
+                    Toast.makeText(context, "Foto Profil Diperbarui", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -50,10 +58,22 @@ class ProfilFragment : Fragment() {
         }
 
         binding.cardFotoProfil.setOnClickListener { bukaGaleri() }
-        binding.menuEditProfil.setOnClickListener { tampilkanDialogEditNama() }
-        binding.menuRiwayat.setOnClickListener { Toast.makeText(context, "Fitur Riwayat akan segera hadir", Toast.LENGTH_SHORT).show() }
-        binding.menuBantuan.setOnClickListener { Toast.makeText(context, "Menghubungi Pusat Bantuan...", Toast.LENGTH_SHORT).show() }
-        binding.menuKeluar.setOnClickListener { Toast.makeText(context, "Berhasil Keluar", Toast.LENGTH_SHORT).show() }
+        binding.menuEditProfil.setOnClickListener { tampilkanDialogEditProfil() }
+        
+        binding.menuBantuan.setOnClickListener { 
+            val intent = Intent(activity, BantuanActivity::class.java)
+            startActivity(intent)
+        }
+        
+        // Logika Keluar (Logout) ke halaman Login
+        binding.menuKeluar.setOnClickListener { 
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            // Hapus stack activity agar user tidak bisa kembali ke halaman sebelumnya
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            requireActivity().finish()
+            Toast.makeText(context, "Berhasil Keluar", Toast.LENGTH_SHORT).show() 
+        }
     }
 
     private fun bukaGaleri() {
@@ -61,39 +81,35 @@ class ProfilFragment : Fragment() {
         galleryLauncher.launch(intent)
     }
 
-    private fun tampilkanDialogEditNama() {
-        val container = FrameLayout(requireContext()).apply {
-            val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                leftMargin = 50
-                rightMargin = 50
-            }
-            layoutParams = params
-        }
+    private fun tampilkanDialogEditProfil() {
+        dialogBinding = DialogEditProfilBinding.inflate(LayoutInflater.from(requireContext()))
+        dialogBinding!!.dialogEtNama.setText(binding.tvNamaProfil.text)
 
-        val input = EditText(context).apply {
-            setText(binding.tvNamaProfil.text)
-        }
-        container.addView(input)
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Ubah Nama Profil")
-            .setMessage("Masukkan nama baru Anda:")
-            .setView(container)
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogBinding!!.root)
             .setPositiveButton("Simpan") { _, _ ->
-                val namaBaru = input.text.toString()
+                val namaBaru = dialogBinding!!.dialogEtNama.text.toString()
                 if (namaBaru.isNotEmpty()) {
                     binding.tvNamaProfil.text = namaBaru
-                    Toast.makeText(context, "Nama berhasil diubah!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "Nama tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                    tempImageUri?.let { binding.imageFotoProfil.setImageURI(it) }
+                    Toast.makeText(context, "Profil diperbarui!", Toast.LENGTH_SHORT).show()
                 }
+                dialogBinding = null
+                tempImageUri = null
             }
-            .setNegativeButton("Batal", null)
-            .show()
+            .setNegativeButton("Batal") { _, _ ->
+                dialogBinding = null
+                tempImageUri = null
+            }
+            .create()
+
+        dialogBinding!!.dialogCardFoto.setOnClickListener { bukaGaleri() }
+        dialog.show()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        dialogBinding = null
     }
 }

@@ -14,10 +14,11 @@ import com.example.myapplication.databinding.FragmentHomeBinding
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
+
+    private var isSaldoVisible = false
+    private val realSaldo = "15.250"
+    private val hiddenSaldo = "••••••"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,6 +31,22 @@ class HomeFragment : Fragment() {
         val username = arguments?.getString("USERNAME")
         binding.textViewUsername.text = username
 
+        // Inisialisasi Tampilan Saldo
+        binding.tvSaldo.text = hiddenSaldo
+        
+        binding.ivToggleSaldo.setOnClickListener {
+            isSaldoVisible = !isSaldoVisible
+            if (isSaldoVisible) {
+                binding.tvSaldo.text = realSaldo
+                // Menggunakan ic_visibility (Mata terbuka)
+                binding.ivToggleSaldo.setImageResource(R.drawable.ic_visibility)
+            } else {
+                binding.tvSaldo.text = hiddenSaldo
+                // Menggunakan ic_visibility_off (Mata tertutup)
+                binding.ivToggleSaldo.setImageResource(R.drawable.ic_visibility_off)
+            }
+        }
+
         binding.buttonCariBankSampah.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, CariBankSampahFragment())
@@ -37,7 +54,6 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        // Listener untuk Tombol Katalog & Harga
         binding.buttonKatalogHarga.setOnClickListener {
             val intent = Intent(activity, KatalogHargaActivity::class.java)
             startActivity(intent)
