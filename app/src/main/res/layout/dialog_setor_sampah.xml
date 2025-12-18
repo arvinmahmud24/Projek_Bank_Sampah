@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Form Setor Sampah"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/tv_label_sampah"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pilih jenis sampah di katalog"
+        android:layout_marginBottom="8dp"
+        android:textStyle="italic"/>
+
+    <EditText
+        android:id="@+id/et_berat_sampah"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Berat (Kg)"
+        android:inputType="numberDecimal"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/tv_total_harga"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Total Harga: Rp 0"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#4CAF50"
+        android:layout_marginBottom="20dp"/>
+
+    <Button
+        android:id="@+id/btn_konfirmasi_setor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Konfirmasi Setor"
+        android:backgroundTint="#4CAF50"
+        android:textColor="@android:color/white"/>
+
+</LinearLayout>
