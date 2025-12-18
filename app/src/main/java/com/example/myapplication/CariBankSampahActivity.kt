@@ -47,8 +47,11 @@ class CariBankSampahActivity : AppCompatActivity(), OnMapReadyCallback {
         populateBankSampahList()
 
         adapter = BankSampahAdapter(bankSampahList) { bankSampah ->
-            mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(bankSampah.lokasi, 17f), 2000, null)
-            markerMap[bankSampah.nama]?.showInfoWindow()
+            // Pergi ke KatalogHargaActivity dengan membawa nama bank sampah
+            val intent = Intent(this, KatalogHargaActivity::class.java).apply {
+                putExtra("NAMA_BANK_SAMPAH", bankSampah.nama)
+            }
+            startActivity(intent)
         }
         recyclerView.adapter = adapter
     }
