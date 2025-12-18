@@ -40,11 +40,9 @@ class HomeFragment : Fragment() {
             isSaldoVisible = !isSaldoVisible
             if (isSaldoVisible) {
                 binding.tvSaldo.text = realSaldo
-                // Menggunakan ic_visibility (Mata terbuka)
                 binding.ivToggleSaldo.setImageResource(R.drawable.ic_visibility)
             } else {
                 binding.tvSaldo.text = hiddenSaldo
-                // Menggunakan ic_visibility_off (Mata tertutup)
                 binding.ivToggleSaldo.setImageResource(R.drawable.ic_visibility_off)
             }
         }
@@ -70,7 +68,14 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
 
-        binding.buttonRiwayat.setOnClickListener {
+        // Listener untuk tombol riwayat pada card saldo
+        binding.layoutLihatRiwayat.setOnClickListener {
+            val intent = Intent(activity, RiwayatActivity::class.java)
+            startActivity(intent)
+        }
+
+        // Listener untuk tombol menu riwayat (jika ID di XML adalah button_pilih_bank_sampah)
+        binding.buttonPilihBankSampah.setOnClickListener {
             val intent = Intent(activity, RiwayatActivity::class.java)
             startActivity(intent)
         }
