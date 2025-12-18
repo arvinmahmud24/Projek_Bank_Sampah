@@ -10,41 +10,58 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header Profil -->
+        <!-- Header Profil Melengkung -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:background="@drawable/header_background">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:text="Profil Saya"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- Konten Profil (Ditarik ke atas agar menumpuk di tengah lengkungan) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/green"
+            android:layout_marginTop="-60dp"
             android:gravity="center"
-            android:orientation="vertical"
-            android:paddingVertical="40dp">
+            android:orientation="vertical">
 
+            <!-- Area Foto Profil -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardFotoProfil"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                app:cardCornerRadius="50dp"
-                app:cardElevation="0dp">
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                app:cardCornerRadius="60dp"
+                app:cardElevation="8dp">
 
                 <ImageView
                     android:id="@+id/imageFotoProfil"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#E0E0E0"
+                    android:background="#FFFFFF"
+                    android:padding="4dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_school"
                     app:tint="#757575" />
             </androidx.cardview.widget.CardView>
 
-            <!-- ID DITAMBAHKAN DI SINI -->
             <TextView
                 android:id="@+id/tvNamaProfil"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Arvin Mahmud S"
-                android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textColor="#212121"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -53,63 +70,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="arvin@example.com"
-                android:textColor="#E0E0E0"
+                android:textColor="#757575"
                 android:textSize="14sp" />
 
         </LinearLayout>
-
-        <!-- Kartu Saldo -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="-24dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Saldo Poin"
-                        android:textColor="#757575"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="15,250"
-                        android:textColor="@color/green"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tukar Poin"
-                    android:backgroundTint="@color/green"
-                    android:textAllCaps="false"/>
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
         <!-- Menu Opsi -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="32dp"
             android:orientation="vertical"
             android:paddingHorizontal="16dp">
 
@@ -134,43 +104,6 @@
                     android:layout_weight="1"
                     android:layout_marginStart="16dp"
                     android:text="Edit Profil"
-                    android:textColor="#212121"
-                    android:textSize="16sp" />
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_location"
-                    android:rotation="270"
-                    app:tint="#BDBDBD"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#EEEEEE" />
-
-            <!-- Item Menu: Riwayat Transaksi -->
-            <LinearLayout
-                android:id="@+id/menuRiwayat"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center_vertical"
-                android:paddingVertical="16dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_history"
-                    app:tint="#757575"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="16dp"
-                    android:text="Riwayat Transaksi"
                     android:textColor="#212121"
                     android:textSize="16sp" />
 
