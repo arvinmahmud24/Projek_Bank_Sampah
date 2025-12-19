@@ -49,7 +49,8 @@ class RegisterActivity : AppCompatActivity() {
                         Toast.makeText(this@RegisterActivity, "Username sudah ada", Toast.LENGTH_SHORT).show()
                     } else {
                         val id = database.push().key
-                        val user = User(id, username, email, password)
+                        // Inisialisasi user dengan poin 0
+                        val user = User(id, username, email, password, 0)
                         id?.let {
                             database.child(it).setValue(user).addOnCompleteListener {
                                 Toast.makeText(this@RegisterActivity, "Registrasi berhasil", Toast.LENGTH_SHORT).show()

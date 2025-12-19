@@ -5,31 +5,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".RiwayatActivity"
-    android:background="#F5F5F5">
+    android:background="#F8F9FA">
 
-    <TextView
-        android:id="@+id/tv_title_riwayat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="16dp"
-        android:text="Riwayat Transaksi"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+    <!-- Header Hijau Melengkung -->
+    <RelativeLayout
+        android:id="@+id/header_riwayat_act"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="@drawable/header_background"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title_riwayat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Riwayat Transaksi"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pantau seluruh aktivitas poin Anda"
+                android:textSize="14sp"
+                android:textColor="#E0E0E0"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- RecyclerView dengan efek overlap -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewRiwayat"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/tv_title_riwayat"
+        android:layout_marginTop="-30dp"
+        app:layout_constraintTop_toBottomOf="@id/header_riwayat_act"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp"
         android:clipToPadding="false"/>
 
     <TextView

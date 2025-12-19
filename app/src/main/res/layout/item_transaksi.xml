@@ -4,21 +4,42 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="12dp"
+    android:layout_marginVertical="6dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="2dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:padding="16dp">
 
+        <!-- Ikon Status -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/icon_container"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/background_checkmark"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/ivIconTransaksi"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:src="@drawable/ic_check"
+                app:tint="@color/green"
+                android:contentDescription="Status Icon" />
+        </LinearLayout>
+
+        <!-- Deskripsi & Tanggal -->
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_toEndOf="@id/icon_container"
+            android:layout_toStartOf="@id/tvPoin"
+            android:layout_centerVertical="true"
             android:orientation="vertical">
 
             <TextView
@@ -26,29 +47,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Setor Sampah"
+                android:textColor="@android:color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvTanggal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="12 Okt 2023"
-                android:textSize="12sp"
-                android:textColor="#757575"
-                android:layout_marginTop="4dp"/>
+                android:text="Bank Sampah Hijau • 2 jam lalu"
+                android:textColor="#6c757d"
+                android:textSize="12sp" />
         </LinearLayout>
 
+        <!-- Poin -->
         <TextView
             android:id="@+id/tvPoin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+500"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:text="+2,500"
+            android:textColor="@color/green"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/green"/>
-
-    </LinearLayout>
+            android:textStyle="bold" />
+    </RelativeLayout>
 
 </androidx.cardview.widget.CardView>

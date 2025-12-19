@@ -1,16 +1,21 @@
+// Fixed R class ambiguity and missing Context import
 package com.example.myapplication.ui.home
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.myapplication.CariBankSampahFragment
 import com.example.myapplication.KatalogHargaActivity
-import com.example.myapplication.RiwayatActivity
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
+import com.example.myapplication.TarikSaldoActivity
 import com.example.myapplication.databinding.FragmentHomeBinding
+import com.google.firebase.database.*
 
 class HomeFragment : Fragment() {
 
@@ -18,8 +23,11 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var isSaldoVisible = false
-    private val realSaldo = "15.250"
+    private var realSaldo = "0"
     private val hiddenSaldo = "••••••"
+
+    private lateinit var dbRef: DatabaseReference
+    private var userId: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,13 +37,37 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val username = arguments?.getString("USERNAME")
-        val email = arguments?.getString("EMAIL")
-        binding.textViewUsername.text = username
+        // Ambil data dari SharedPreferences sebagai fallback utama agar sesi tidak hilang
+        val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        userId = arguments?.getString("USER_ID") ?: sharedPref.getString("USER_ID", null)
+        val username = arguments?.getString("USERNAME") ?: sharedPref.getString("USERNAME", null)
+        val email = arguments?.getString("EMAIL") ?: sharedPref.getString("EMAIL", null)
+
+        binding.textViewUsername.text = username ?: "User"
 
         // Inisialisasi Tampilan Saldo
         binding.tvSaldo.text = hiddenSaldo
-        
+
+        // Hubungkan ke Firebase untuk mengambil poin real-time
+        if (userId != null) {
+            dbRef = FirebaseDatabase.getInstance().getReference("users").child(userId!!)
+            dbRef.child("poin").addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val poin = snapshot.getValue(Int::class.java) ?: 0
+                    realSaldo = String.format("%,d", poin)
+
+                    // Update tampilan jika sedang visible
+                    if (isSaldoVisible) {
+                        binding.tvSaldo.text = realSaldo
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                }
+            })
+        }
+
         binding.ivToggleSaldo.setOnClickListener {
             isSaldoVisible = !isSaldoVisible
             if (isSaldoVisible) {
@@ -47,9 +79,11 @@ class HomeFragment : Fragment() {
             }
         }
 
+        // Row 1: Cari Bank Sampah
         binding.buttonCariBankSampah.setOnClickListener {
             val fragment = CariBankSampahFragment().apply {
                 arguments = Bundle().apply {
+                    putString("USER_ID", userId)
                     putString("USERNAME", username)
                     putString("EMAIL", email)
                 }
@@ -60,23 +94,24 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
+        // Row 2: Katalog & Harga
         binding.buttonKatalogHarga.setOnClickListener {
-            val intent = Intent(activity, KatalogHargaActivity::class.java).apply {
+            val intent = Intent(requireContext(), KatalogHargaActivity::class.java).apply {
+                putExtra("USER_ID", userId)
                 putExtra("USERNAME", username)
                 putExtra("EMAIL", email)
             }
             startActivity(intent)
         }
 
-        // Listener untuk tombol riwayat pada card saldo
+        // Link Riwayat dari footer Saldo
         binding.layoutLihatRiwayat.setOnClickListener {
-            val intent = Intent(activity, RiwayatActivity::class.java)
-            startActivity(intent)
+            (activity as? MainActivity)?.setSelectedTab(R.id.nav_transaction)
         }
 
-        // Listener untuk tombol menu riwayat (jika ID di XML adalah button_pilih_bank_sampah)
-        binding.buttonPilihBankSampah.setOnClickListener {
-            val intent = Intent(activity, RiwayatActivity::class.java)
+        // Row 3: Tarik Saldo
+        binding.buttonTarikSaldo.setOnClickListener {
+            val intent = Intent(requireContext(), TarikSaldoActivity::class.java)
             startActivity(intent)
         }
 
