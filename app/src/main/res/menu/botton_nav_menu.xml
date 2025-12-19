@@ -13,8 +13,8 @@
 
     <item
         android:id="@+id/nav_transaction"
-        android:icon="@drawable/ic_money"
-        android:title="Transaksi" />
+        android:icon="@drawable/ic_history"
+        android:title="Riwayat" />
 
     <item
         android:id="@+id/nav_profile"

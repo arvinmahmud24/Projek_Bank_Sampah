@@ -1,5 +1,6 @@
 package com.example.myapplication.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -38,8 +39,19 @@ class LoginActivity : AppCompatActivity() {
                             val dbPassword = userSnapshot.child("password").getValue(String::class.java)
                             if (dbPassword == password) {
                                 val email = userSnapshot.child("email").getValue(String::class.java)
+                                val userId = userSnapshot.key
+
+                                // SIMPAN KE SHARED PREFERENCES AGAR TIDAK HILANG
+                                val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                                with(sharedPref.edit()) {
+                                    putString("USER_ID", userId)
+                                    putString("USERNAME", username)
+                                    putString("EMAIL", email)
+                                    apply()
+                                }
 
                                 val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
+                                    putExtra("USER_ID", userId)
                                     putExtra("USERNAME", username)
                                     putExtra("EMAIL", email)
                                 }

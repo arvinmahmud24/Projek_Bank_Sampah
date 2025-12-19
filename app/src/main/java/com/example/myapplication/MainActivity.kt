@@ -9,6 +9,7 @@ import com.example.myapplication.ui.home.HomeFragment
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var userId: String? = null
     private var username: String? = null
     private var email: String? = null
 
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        userId = intent.getStringExtra("USER_ID")
         username = intent.getStringExtra("USERNAME")
         email = intent.getStringExtra("EMAIL")
 
@@ -26,20 +28,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_home -> {
                     selectedFragment = HomeFragment().apply {
                         arguments = Bundle().apply {
+                            putString("USER_ID", userId)
                             putString("USERNAME", username)
-                            putString("EMAIL", email) // Baris ini ditambahkan
+                            putString("EMAIL", email)
                         }
                     }
                 }
-//                R.id.nav_map -> {
-//                    selectedFragment = PetaFragment()
-//                }
                 R.id.nav_transaction -> {
                     selectedFragment = TransaksiFragment()
                 }
                 R.id.nav_profile -> {
                     selectedFragment = ProfilFragment().apply {
                         arguments = Bundle().apply {
+                            putString("USER_ID", userId)
                             putString("USERNAME", username)
                             putString("EMAIL", email)
                         }
@@ -57,5 +58,10 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             binding.bottomNavigation.selectedItemId = R.id.nav_home
         }
+    }
+
+    // Method pembantu untuk pindah tab dari fragment lain
+    fun setSelectedTab(itemId: Int) {
+        binding.bottomNavigation.selectedItemId = itemId
     }
 }

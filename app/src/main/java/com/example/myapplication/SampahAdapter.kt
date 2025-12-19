@@ -11,7 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class SampahAdapter(
     private val sampahList: List<Sampah>,
-    private val onTotalChanged: (Double) -> Unit
+    private val isReadOnly: Boolean = false, // Mode default bukan read-only
+    private val onTotalChanged: ((Double) -> Unit)? = null // Callback opsional
 ) : RecyclerView.Adapter<SampahAdapter.ViewHolder>() {
 
     private val beratMap = mutableMapOf<Int, Double>()
@@ -27,34 +28,38 @@ class SampahAdapter(
             namaSampah.text = sampah.nama
             hargaSampah.text = sampah.harga
             
-            // Bersihkan TextWatcher lama agar tidak terjadi penumpukan
-            etBerat.removeTextChangedListener(textWatcher)
-            
-            // Set nilai berat dari map jika ada
-            val currentBerat = beratMap[position] ?: 0.0
-            etBerat.setText(if (currentBerat > 0) currentBerat.toString() else "")
+            // Logika berdasarkan mode read-only
+            if (isReadOnly) {
+                etBerat.visibility = View.GONE
+            } else {
+                etBerat.visibility = View.VISIBLE
+                
+                etBerat.removeTextChangedListener(textWatcher)
+                val currentBerat = beratMap[position] ?: 0.0
+                etBerat.setText(if (currentBerat > 0) currentBerat.toString() else "")
 
-            textWatcher = object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    val berat = s.toString().toDoubleOrNull() ?: 0.0
-                    beratMap[position] = berat
-                    calculateTotal()
+                textWatcher = object : TextWatcher {
+                    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                        val berat = s.toString().toDoubleOrNull() ?: 0.0
+                        beratMap[position] = berat
+                        calculateTotal()
+                    }
+                    override fun afterTextChanged(s: Editable?) {}
                 }
-                override fun afterTextChanged(s: Editable?) {}
+                etBerat.addTextChangedListener(textWatcher)
             }
-            etBerat.addTextChangedListener(textWatcher)
         }
     }
 
     private fun calculateTotal() {
         var grandTotal = 0.0
         beratMap.forEach { (position, berat) ->
-            val hargaString = sampahList[position].harga.replace("Rp. ", "").replace(",", "")
+            val hargaString = sampahList[position].harga.replace(Regex("[^0-9]"), "")
             val harga = hargaString.toDoubleOrNull() ?: 0.0
             grandTotal += berat * harga
         }
-        onTotalChanged(grandTotal)
+        onTotalChanged?.invoke(grandTotal)
     }
 
     fun getSetoranData(): Map<Int, Double> = beratMap

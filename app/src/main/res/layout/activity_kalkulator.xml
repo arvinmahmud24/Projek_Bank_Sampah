@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8F9FA"
+    android:background="@color/app_background"
     tools:context=".KalkulatorActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -63,7 +63,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:hint="Masukkan Jumlah (Kg/Liter/Unit)">
+            android:hint="Masukkan Jumlah (Kg/Liter/Unit)"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etBerat"
@@ -109,6 +110,19 @@
                 android:textColor="@android:color/black"
                 android:layout_marginTop="8dp"/>
         </LinearLayout>
+
+        <!-- Tombol Simpan (Baru) -->
+        <Button
+            android:id="@+id/btnSimpan"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="24dp"
+            android:text="Simpan ke Saldo"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#1B5E20"
+            app:cornerRadius="12dp"
+            android:visibility="gone" /> <!-- Muncul setelah hitung -->
 
     </LinearLayout>
 
