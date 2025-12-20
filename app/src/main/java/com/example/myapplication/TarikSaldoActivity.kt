@@ -3,12 +3,10 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.database.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -17,7 +15,9 @@ class TarikSaldoActivity : AppCompatActivity() {
 
     private lateinit var tvSaldoTersedia: TextView
     private lateinit var etNominal: EditText
-    private lateinit var etTujuan: EditText
+    private lateinit var etTujuan: AutoCompleteTextView
+    private lateinit var tilNomorTujuan: TextInputLayout
+    private lateinit var etNomorTujuan: EditText
     private lateinit var btnKonfirmasi: Button
     
     private var userId: String? = null
@@ -35,7 +35,24 @@ class TarikSaldoActivity : AppCompatActivity() {
         tvSaldoTersedia = findViewById(R.id.tvSaldoTersedia)
         etNominal = findViewById(R.id.etNominalTarik)
         etTujuan = findViewById(R.id.etTujuanTarik)
+        tilNomorTujuan = findViewById(R.id.tilNomorTujuan)
+        etNomorTujuan = findViewById(R.id.etNomorTujuan)
         btnKonfirmasi = findViewById(R.id.btnKonfirmasiTarik)
+
+        // Setup Dropdown Pilihan Bank/Wallet
+        val listTujuan = arrayOf("Bank BCA", "Bank BRI", "Bank BNI", "Bank Mandiri", "DANA", "GoPay", "OVO", "ShopeePay")
+        val adapterTujuan = ArrayAdapter(this, android.R.layout.simple_list_item_1, listTujuan)
+        etTujuan.setAdapter(adapterTujuan)
+
+        // Logika Dinamis: Ubah Hint berdasarkan pilihan
+        etTujuan.setOnItemClickListener { parent, _, position, _ ->
+            val selected = parent.getItemAtPosition(position).toString()
+            if (selected.startsWith("Bank")) {
+                tilNomorTujuan.hint = "Nomor Rekening"
+            } else {
+                tilNomorTujuan.hint = "Nomor Telepon"
+            }
+        }
 
         val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
         userId = sharedPref.getString("USER_ID", null)
@@ -47,15 +64,14 @@ class TarikSaldoActivity : AppCompatActivity() {
         }
 
         dbRef = FirebaseDatabase.getInstance().reference
-        
-        // Ambil saldo real-time
         fetchCurrentPoin()
 
         btnKonfirmasi.setOnClickListener {
             val nominalStr = etNominal.text.toString()
             val tujuan = etTujuan.text.toString()
+            val nomor = etNomorTujuan.text.toString()
 
-            if (nominalStr.isEmpty() || tujuan.isEmpty()) {
+            if (nominalStr.isEmpty() || tujuan.isEmpty() || nomor.isEmpty()) {
                 Toast.makeText(this, "Harap isi semua kolom", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -72,7 +88,7 @@ class TarikSaldoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            lakukanPenarikan(nominal, tujuan)
+            lakukanPenarikan(nominal, "$tujuan ($nomor)")
         }
     }
 
@@ -87,25 +103,22 @@ class TarikSaldoActivity : AppCompatActivity() {
             })
     }
 
-    private fun lakukanPenarikan(nominal: Int, tujuan: String) {
+    private fun lakukanPenarikan(nominal: Int, detailTujuan: String) {
         val userPoinRef = dbRef.child("users").child(userId!!).child("poin")
 
         userPoinRef.runTransaction(object : Transaction.Handler {
             override fun doTransaction(mutableData: MutableData): Transaction.Result {
                 val poinSekarang = mutableData.getValue(Int::class.java) ?: 0
-                if (poinSekarang < nominal) {
-                    return Transaction.abort()
-                }
+                if (poinSekarang < nominal) return Transaction.abort()
                 mutableData.value = poinSekarang - nominal
                 return Transaction.success(mutableData)
             }
 
             override fun onComplete(error: DatabaseError?, committed: Boolean, snapshot: DataSnapshot?) {
                 if (committed) {
-                    catatRiwayatPenarikan(nominal, tujuan)
+                    catatRiwayatPenarikan(nominal, detailTujuan)
                     Toast.makeText(this@TarikSaldoActivity, "Penarikan berhasil diproses!", Toast.LENGTH_LONG).show()
                     
-                    // Navigasi ke halaman riwayat (tab Mutasi di MainActivity)
                     val intent = Intent(this@TarikSaldoActivity, MainActivity::class.java).apply {
                         putExtra("OPEN_TAB", "MUTASI")
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -119,14 +132,14 @@ class TarikSaldoActivity : AppCompatActivity() {
         })
     }
 
-    private fun catatRiwayatPenarikan(nominal: Int, tujuan: String) {
+    private fun catatRiwayatPenarikan(nominal: Int, detailTujuan: String) {
         val riwayatRef = dbRef.child("riwayat_transaksi").push()
         val tanggal = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date())
         
         val dataRiwayat = hashMapOf(
             "userId" to userId,
             "tanggal" to tanggal,
-            "deskripsi" to "Penarikan ke $tujuan",
+            "deskripsi" to "Penarikan ke $detailTujuan",
             "poin" to "-${String.format("%,d", nominal)}",
             "isMasuk" to false
         )
