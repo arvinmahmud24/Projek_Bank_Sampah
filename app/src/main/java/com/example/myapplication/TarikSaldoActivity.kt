@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -103,6 +104,13 @@ class TarikSaldoActivity : AppCompatActivity() {
                 if (committed) {
                     catatRiwayatPenarikan(nominal, tujuan)
                     Toast.makeText(this@TarikSaldoActivity, "Penarikan berhasil diproses!", Toast.LENGTH_LONG).show()
+                    
+                    // Navigasi ke halaman riwayat (tab Mutasi di MainActivity)
+                    val intent = Intent(this@TarikSaldoActivity, MainActivity::class.java).apply {
+                        putExtra("OPEN_TAB", "MUTASI")
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                    startActivity(intent)
                     finish()
                 } else {
                     Toast.makeText(this@TarikSaldoActivity, "Gagal: ${error?.message}", Toast.LENGTH_SHORT).show()

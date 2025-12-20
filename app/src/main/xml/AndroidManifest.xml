@@ -82,11 +82,6 @@
             android:theme="@style/Theme.MyApplication.NoActionBar" />
 
         <activity
-            android:name=".TransferSaldoActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyApplication.NoActionBar" />
-
-        <activity
             android:name=".SetorSampahActivity"
             android:exported="false"
             android:theme="@style/Theme.MyApplication.NoActionBar" />

@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
-    tools:context=".TransaksiFragment">
+    tools:context=".SetorSampahActivity"
+    android:background="#F8F9FA">
 
     <!-- Header Hijau Melengkung -->
     <RelativeLayout
-        android:id="@+id/header_riwayat"
+        android:id="@+id/header_setor"
         android:layout_width="match_parent"
         android:layout_height="180dp"
         android:background="@drawable/header_background"
@@ -24,34 +24,48 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvTitleRiwayat"
+                android:id="@+id/tv_nama_bank_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Riwayat Transaksi"
-                android:textSize="24sp"
+                android:text="Setor ke Bank Sampah"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 android:textColor="@color/white"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Daftar aktivitas transaksi Anda"
+                android:text="Kalkulasi poin sampah yang akan disetor"
                 android:textSize="14sp"
                 android:textColor="#E0E0E0"/>
         </LinearLayout>
     </RelativeLayout>
 
-    <!-- List Transaksi (Dimulai tepat di bawah atau sedikit overlap dengan header) -->
+    <!-- RecyclerView (Mode Interaktif) -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTransaksi"
+        android:id="@+id/rvSetorSampah"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="-20dp"
-        app:layout_constraintTop_toBottomOf="@id/header_riwayat"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="-30dp"
+        app:layout_constraintTop_toBottomOf="@id/header_setor"
+        app:layout_constraintBottom_toTopOf="@id/btn_proses_setor"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"/>
+        android:paddingTop="8dp"
+        android:clipToPadding="false"/>
+
+    <!-- Tombol Setor -->
+    <Button
+        android:id="@+id/btn_proses_setor"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_margin="16dp"
+        android:text="Setorkan Sekarang"
+        android:backgroundTint="#1B5E20"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
