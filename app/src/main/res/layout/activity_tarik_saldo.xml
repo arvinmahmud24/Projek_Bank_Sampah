@@ -65,18 +65,36 @@
                 android:inputType="number"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Input Rekening/Tujuan -->
+        <!-- Input Rekening/Tujuan (Berupa Dropdown) -->
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/menuTujuan"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Tujuan (Bank/E-Wallet)"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-            <com.google.android.material.textfield.TextInputEditText
+            android:hint="Pilih Bank / E-Wallet">
+
+            <AutoCompleteTextView
                 android:id="@+id/etTujuanTarik"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"/>
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Input Nomor Rekening/HP (ID tilNomorTujuan ditambahkan) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilNomorTujuan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Nomor Rekening / HP"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNomorTujuan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
