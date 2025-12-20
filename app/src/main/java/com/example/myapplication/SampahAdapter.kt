@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class SampahAdapter(
     private val sampahList: List<Sampah>,
-    private val isReadOnly: Boolean = false, // Mode default bukan read-only
-    private val onTotalChanged: ((Double) -> Unit)? = null // Callback opsional
+    private val isReadOnly: Boolean = false,
+    private val onTotalChanged: ((Double) -> Unit)? = null
 ) : RecyclerView.Adapter<SampahAdapter.ViewHolder>() {
 
     private val beratMap = mutableMapOf<Int, Double>()
@@ -28,7 +28,6 @@ class SampahAdapter(
             namaSampah.text = sampah.nama
             hargaSampah.text = sampah.harga
             
-            // Logika berdasarkan mode read-only
             if (isReadOnly) {
                 etBerat.visibility = View.GONE
             } else {
@@ -55,6 +54,7 @@ class SampahAdapter(
     private fun calculateTotal() {
         var grandTotal = 0.0
         beratMap.forEach { (position, berat) ->
+            // Membersihkan string harga (misal "Rp. 5.000" -> 5000)
             val hargaString = sampahList[position].harga.replace(Regex("[^0-9]"), "")
             val harga = hargaString.toDoubleOrNull() ?: 0.0
             grandTotal += berat * harga

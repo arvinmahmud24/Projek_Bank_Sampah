@@ -1,11 +1,14 @@
 package com.example.myapplication
 
 import android.Manifest
-import android.content.Intent
+import android.content.Context
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,73 +25,100 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.firebase.database.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class CariBankSampahActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var mMap: GoogleMap? = null
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: BankSampahAdapter
     private val bankSampahList = mutableListOf<BankSampah>()
+    private val sampahList = mutableListOf<Sampah>()
+    private lateinit var trashAdapter: SampahAdapter
+    
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val markerMap = HashMap<String, Marker>()
+    
+    private var currentGrandTotal: Double = 0.0
+    private var selectedBankName: String? = null
+    private var userId: String? = null
+
+    private lateinit var tvSelectedBank: TextView
+    private lateinit var rvInput: RecyclerView
+    private lateinit var btnSetorkan: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cari_bank_sampah)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        
+        // Ambil sesi user
+        val sharedPref = getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+        userId = sharedPref.getString("USER_ID", null)
+
+        tvSelectedBank = findViewById(R.id.tvSelectedBank)
+        rvInput = findViewById(R.id.recyclerViewInputSampah)
+        btnSetorkan = findViewById(R.id.btn_setorkan_langsung)
+
+        setupTrashRecyclerView()
+        populateBankSampahList()
+        populateTrashList()
 
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        recyclerView = findViewById(R.id.recyclerViewBankSampah)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        populateBankSampahList()
-
-        adapter = BankSampahAdapter(bankSampahList) { bankSampah ->
-            // Pergi ke KatalogHargaActivity dengan membawa nama bank sampah
-            val intent = Intent(this, KatalogHargaActivity::class.java).apply {
-                putExtra("NAMA_BANK_SAMPAH", bankSampah.nama)
+        btnSetorkan.setOnClickListener {
+            if (currentGrandTotal > 0 && selectedBankName != null) {
+                showConfirmationDialog()
             }
-            startActivity(intent)
         }
-        recyclerView.adapter = adapter
+    }
+
+    private fun setupTrashRecyclerView() {
+        rvInput.layoutManager = LinearLayoutManager(this)
+        rvInput.visibility = View.GONE
+        
+        trashAdapter = SampahAdapter(sampahList, isReadOnly = false) { total ->
+            currentGrandTotal = total
+            if (total > 0) {
+                btnSetorkan.visibility = View.VISIBLE
+                btnSetorkan.text = "Setorkan (pts ${String.format("%,.0f", total)})"
+            } else {
+                btnSetorkan.visibility = View.GONE
+            }
+        }
+        rvInput.adapter = trashAdapter
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        
-        // HILANGKAN TOMBOL UI PETA
-        mMap?.uiSettings?.isZoomControlsEnabled = false
-        mMap?.uiSettings?.isMyLocationButtonEnabled = false
-        mMap?.uiSettings?.isMapToolbarEnabled = false
-
         setupMapListeners()
-        
         checkAndGetLocation()
+        setupMapWithInitialData()
     }
 
     private fun checkAndGetLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
         } else {
-            setupMapWithInitialData()
             mMap?.isMyLocationEnabled = true
             hitungJarakAsli()
         }
     }
-    
-    private fun setupMapWithInitialData(){
+
+    private fun setupMapWithInitialData() {
         mMap?.clear()
         markerMap.clear()
         val boundsBuilder = LatLngBounds.Builder()
 
         for (bank in bankSampahList) {
-            val marker = mMap?.addMarker(MarkerOptions()
-                .position(bank.lokasi)
-                .title(bank.nama)
-                .snippet("Klik untuk rute"))
+            val marker = mMap?.addMarker(
+                MarkerOptions()
+                    .position(bank.lokasi)
+                    .title(bank.nama)
+                    .snippet("Klik untuk pilih")
+            )
             marker?.tag = bank
             marker?.let { markerMap[bank.nama] = it }
             boundsBuilder.include(bank.lokasi)
@@ -109,38 +139,82 @@ class CariBankSampahActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (location != null) {
                     bankSampahList.forEach {
                         val results = FloatArray(1)
-                        android.location.Location.distanceBetween(location.latitude, location.longitude, it.lokasi.latitude, it.lokasi.longitude, results)
+                        android.location.Location.distanceBetween(
+                            location.latitude, location.longitude,
+                            it.lokasi.latitude, it.lokasi.longitude, results
+                        )
                         it.jarak = results[0]
                     }
                     bankSampahList.sortBy { it.jarak }
-                    adapter.notifyDataSetChanged()
                 }
             }
     }
 
     private fun setupMapListeners() {
         mMap?.setOnMarkerClickListener { marker ->
-            mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 17f), 1500, null)
-            marker.showInfoWindow()
+            val bank = marker.tag as? BankSampah
+            if (bank != null) {
+                selectedBankName = bank.nama
+                tvSelectedBank.text = "Bank: ${bank.nama}"
+                rvInput.visibility = View.VISIBLE
+                mMap?.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.position, 15f))
+                marker.showInfoWindow()
+            }
             true
         }
+    }
 
-        mMap?.setOnInfoWindowClickListener { marker ->
-            val bank = marker.tag as? BankSampah
-            bank?.let { 
-                val gmmIntentUri = Uri.parse("google.navigation:q=${it.lokasi.latitude},${it.lokasi.longitude}")
-                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
-                mapIntent.setPackage("com.google.android.apps.maps")
-                if (mapIntent.resolveActivity(packageManager) != null) {
-                    startActivity(mapIntent)
-                } else {
-                    Toast.makeText(this, "Google Maps tidak terinstal.", Toast.LENGTH_SHORT).show()
+    private fun showConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Konfirmasi Setoran")
+            .setMessage("Setor ke $selectedBankName senilai ${currentGrandTotal.toInt()} poin?")
+            .setPositiveButton("Ya") { _, _ -> simpanKeFirebase() }
+            .setNegativeButton("Tidak", null)
+            .show()
+    }
+
+    private fun simpanKeFirebase() {
+        if (userId == null) return
+        val database = FirebaseDatabase.getInstance().reference
+        
+        val userRef = database.child("users").child(userId!!).child("poin")
+        userRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val current = mutableData.getValue(Int::class.java) ?: 0
+                mutableData.value = current + currentGrandTotal.toInt()
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(error: DatabaseError?, committed: Boolean, snapshot: DataSnapshot?) {
+                if (committed) {
+                    catatRiwayat()
+                    Toast.makeText(this@CariBankSampahActivity, "Transaksi Berhasil!", Toast.LENGTH_SHORT).show()
+                    rvInput.visibility = View.GONE
+                    btnSetorkan.visibility = View.GONE
+                    tvSelectedBank.text = "Pilih Bank di Peta"
                 }
             }
-        }
+        })
     }
-    
-    private fun populateBankSampahList(){
+
+    private fun catatRiwayat() {
+        val riwayatRef = FirebaseDatabase.getInstance().getReference("riwayat_transaksi").push()
+        val tanggal = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date())
+        val setoranData = trashAdapter.getSetoranData()
+        val descBuilder = StringBuilder("Setor di $selectedBankName: ")
+        setoranData.forEach { (pos, berat) -> if (berat > 0) descBuilder.append("${sampahList[pos].nama} ($berat Kg), ") }
+
+        val data = hashMapOf(
+            "userId" to userId,
+            "tanggal" to tanggal,
+            "deskripsi" to descBuilder.toString().removeSuffix(", "),
+            "poin" to "+${currentGrandTotal.toInt()}",
+            "isMasuk" to true
+        )
+        riwayatRef.setValue(data)
+    }
+
+    private fun populateBankSampahList() {
         bankSampahList.add(BankSampah("Bank Sampah Surolaras", "Jl. Suronatan No.Blok NG-2/51, Ngampilan", LatLng(-7.8005, 110.3610)))
         bankSampahList.add(BankSampah("Bank Sampah Mondoroko RW 7", "Jl. Mondorakan No.27, Kotagede", LatLng(-7.8286, 110.3957)))
         bankSampahList.add(BankSampah("Bank Sampah Suryo Resik", "Mj 2/822, RT.44/RW.13, Suryodiningratan", LatLng(-7.8180, 110.3650)))
@@ -162,11 +236,19 @@ class CariBankSampahActivity : AppCompatActivity(), OnMapReadyCallback {
         bankSampahList.add(BankSampah("Bank Sampah Igakanas", "Kabupaten Bantul, DIY", LatLng(-7.8900, 110.3500)))
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // Setelah izin diberikan, jalankan kembali logika lokasi
-            checkAndGetLocation()
-        }
+    private fun populateTrashList() {
+        sampahList.add(Sampah("Minyak Jelantah", "Rp. 3.600"))
+        sampahList.add(Sampah("Ember Warna", "Rp. 1.500"))
+        sampahList.add(Sampah("Besi A", "Rp. 2.760"))
+        sampahList.add(Sampah("Kardus", "Rp. 1.260"))
+        sampahList.add(Sampah("Tembaga", "Rp. 45.000"))
+        sampahList.add(Sampah("Aki Bekas", "Rp. 6.000"))
+        sampahList.add(Sampah("Kantong Kresek", "Rp. 50"))
+        sampahList.add(Sampah("Beling Putih", "Rp. 120"))
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 }

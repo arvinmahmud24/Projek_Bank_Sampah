@@ -54,8 +54,12 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // Set default fragment
-        if (savedInstanceState == null) {
+        // Cek apakah ada instruksi untuk membuka tab tertentu (misal setelah transaksi)
+        val openTab = intent.getStringExtra("OPEN_TAB")
+        if (openTab == "MUTASI") {
+            binding.bottomNavigation.selectedItemId = R.id.nav_transaction
+        } else if (savedInstanceState == null) {
+            // Set default fragment ke Home
             binding.bottomNavigation.selectedItemId = R.id.nav_home
         }
     }

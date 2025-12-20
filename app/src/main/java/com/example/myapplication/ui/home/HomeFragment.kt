@@ -39,9 +39,9 @@ class HomeFragment : Fragment() {
 
         // Ambil data dari SharedPreferences sebagai fallback utama agar sesi tidak hilang
         val sharedPref = requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-        userId = arguments?.getString("USER_ID") ?: sharedPref.getString("USER_ID", null)
-        val username = arguments?.getString("USERNAME") ?: sharedPref.getString("USERNAME", null)
-        val email = arguments?.getString("EMAIL") ?: sharedPref.getString("EMAIL", null)
+        userId = sharedPref.getString("USER_ID", null)
+        val username = sharedPref.getString("USERNAME", null)
+        val email = sharedPref.getString("EMAIL", null)
 
         binding.textViewUsername.text = username ?: "User"
 
@@ -104,7 +104,7 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
 
-        // Link Riwayat dari footer Saldo
+        // Navigasi ke Tab Mutasi dari footer Saldo
         binding.layoutLihatRiwayat.setOnClickListener {
             (activity as? MainActivity)?.setSelectedTab(R.id.nav_transaction)
         }
